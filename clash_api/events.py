@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from config.prefs import CHAT_ID, CLAN_TAG, coc_client, bot, dp
+from config.prefs import CHAT_ID, CLAN_TAG, coc_client, bot, dp, ACADEMY_CLAN_TAG
 from db import DL
 
 
@@ -10,6 +10,11 @@ async def register_markup():
     clan = await coc_client.get_clan(CLAN_TAG)
     DL.create_table()
     for member in clan.members:
+        if not DL.exists_by_clash_tag(member.tag):
+            player_markup.insert(InlineKeyboardButton(text=f"{member.name}({member.tag})",
+                                                      callback_data=f"user{member.tag}"))
+    academy_clan = await coc_client.get_clan(ACADEMY_CLAN_TAG)
+    for member in academy_clan.members:
         if not DL.exists_by_clash_tag(member.tag):
             player_markup.insert(InlineKeyboardButton(text=f"{member.name}({member.tag})",
                                                       callback_data=f"user{member.tag}"))

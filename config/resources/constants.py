@@ -21,12 +21,13 @@ war_result = {"tie": " ничья",
               "inWar": "определить не удалось",
               "warEnded": "определить не удалось"}
 
-kb_menu = ReplyKeyboardMarkup(resize_keyboard=True)
+hello_message = "Привет, это clash of clans бот.Если ты не против, я буду напоминать тебе про атаки на кв. Если тебе это не надо - кинь меня в чс"
+
+kb_menu = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
 b1 = InlineKeyboardButton('📝')
 b2 = InlineKeyboardButton('👨‍💼')
 b3 = InlineKeyboardButton('👑')
-b4 = InlineKeyboardButton('⚔')
-kb_menu.add(b1, b2).add(b3, b4)
+kb_menu.add(b1, b2).add(b3)
 
 panic_message = "Обнаружен нарушитель🥷! ВИУ-ВИУ-ВИУ🚨.\n\n" \
                 "Чтобы стать порядочным гражданином чата 🙎‍♂, нажми 📝 на клавиатуре снизу и нажми на свой ник."

@@ -7,7 +7,7 @@ from coc import WarRound
 from clash_api import clash_player, clash_war, clash_clan
 from clash_api.clash_clan import *
 # from clash_api.clash_war import warlog_markup, get_loosers
-from config.prefs import CHAT_ID, MESSAGE_ID_TO_EDIT, CLAN_TAG, USER_BOT
+# from config.prefs import CHAT_ID, MESSAGE_ID_TO_EDIT, CLAN_TAG, USER_BOT
 
 
 # async def create_pinned_message(war):  # return string with war stars and time to end

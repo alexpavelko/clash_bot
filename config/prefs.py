@@ -4,8 +4,8 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from telethon import TelegramClient
 
 # telegram chat
+# CHAT_ID = -1001158139685
 CHAT_ID = -1001830875232
-MESSAGE_ID_TO_EDIT = 9788
 
 # aiogram
 TOKEN = '1695339294:AAHGEZn-lFn5TiU3B8JRCjB909edF_vPHVI'
@@ -18,6 +18,7 @@ USER_BOT = 'Dark Elite'
 
 # coc.py
 CLAN_TAG = "#RYLQCJ2J"
+ACADEMY_CLAN_TAG = "#2909YPCRU"
 COC_LOGIN = 'pavelkobond@gmail.com'
 COC_PASSWORD = 'Sanya_007'
 

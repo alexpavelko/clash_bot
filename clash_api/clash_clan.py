@@ -1,9 +1,12 @@
 import asyncio
 import operator
 
+from aiogram.utils import exceptions
+
+from clash_api import clash_war
 from clash_api.clash_player import mention_user
+from config.prefs import CLAN_TAG, coc_client, ACADEMY_CLAN_TAG, bot, CHAT_ID
 from config.resources.constants import roles, war_result, shield_colors
-from config.prefs import CLAN_TAG, coc_client
 
 
 async def get_shields():
@@ -32,8 +35,7 @@ async def get_shields():
     return result_message
 
 
-async def get_roles():
-    clan = await coc_client.get_clan(CLAN_TAG)
+async def get_roles(clan):
     players = []
     result_string, current_role = "", "глава"
     number = 1
@@ -54,6 +56,16 @@ async def get_roles():
         result_string += f"{number}. {player['name']} ({player['town_hall']}тх), {player['role']}\n"
         number += 1
     return result_string
+
+
+async def get_members():
+    clan = await coc_client.get_clan(CLAN_TAG)
+    academy_clan = await coc_client.get_clan(ACADEMY_CLAN_TAG)
+    result_message = "Игроки Dark Elite\n\n"
+    result_message += await get_roles(clan)
+    result_message += "\n\nИгроки академа(D.Elite Academy)\n\n"
+    result_message += await get_roles(academy_clan)
+    return result_message
 
 
 def get_hero_percent(player, player_sum_level=0, player_max_sum_level=0, player_min_sum_level=0):
@@ -103,37 +115,44 @@ def get_progress_for_player(player, total=100):
     return result_msg
 
 
-def notify_attacks(message):
-    pass
+async def notify_attacks(text_message):
+    await clash_war.send_message_to_users_without_attacks(text_message)
 
 
-async def get_war_scores(war):
-    result_msg = ""
+async def get_war_scores(war, message):
     if war.clan.tag == CLAN_TAG:
         scores_string = f"{war.clan.name}:{war.clan.stars}⭐ ⚔ {war.opponent.stars}⭐ {war.opponent.name}"
     else:
         scores_string = f"{war.opponent.name}{war.opponent.stars}⭐ ⚔ {war.clan.stars}⭐ {war.clan.name}"
-    result_msg += scores_string
+    result_msg = scores_string
     total_sec = war.end_time.seconds_until
     if total_sec > 0:
         hours = int(total_sec / 3600)
         minutes = (int(total_sec / 60)) % 60
         time_string = f"{minutes} минут\n" if hours == 0 else f"{hours} часов {minutes} минут\n"
         result_msg += f"\nДо конца кв осталось {time_string}\n"
-        if total_sec == 3600 or total_sec == 3600 * 2 or total_sec == 3600 * 6:
-            message = f"Привет, проведи атаки в клешке, до конца войны осталось {time_string}"
-            notify_attacks(message)
-    print(result_msg)
-    return result_msg
+        if total_sec == 3600 or total_sec == 3600 * 6:
+            text_message = f"До конца войны осталось {time_string}, проведи атаки!"
+            await notify_attacks(text_message)
+        elif total_sec == 3600 * 12:
+            text_message = f"Прошло 12 часов, проведи атаки в клешке!"
+            await notify_attacks(text_message)
+        elif total_sec == 3600 * 23:
+            text_message = f"Кв началось, время провести первую атаку!"
+            await notify_attacks(text_message)
+    try:
+        await bot.edit_message_text(chat_id=CHAT_ID, text=result_msg, message_id=message.message_id)
+    except Exception:
+        pass
 
 
-async def check_war_state():
+async def check_war_state(message):
     war = await coc_client.get_current_war(CLAN_TAG)
     if war is None:
         return "Война не запущена."
-    while war.end_time:
-        await get_war_scores(war)
+    while war.end_time.seconds_until > 0:
+        await get_war_scores(war, message)
         await asyncio.sleep(31)
-    print(f"Война завершена. Результат: {war_result[war.state]}")
-    await get_shields()
-    await coc_client.close()
+    shields = await get_shields()
+    return f"Война завершена. Результат: {war_result[war.status]}\n{shields}"
+
