@@ -1,11 +1,11 @@
 import coc
 from aiogram import types
 from aiogram.utils import executor
+
+import services
 from clash_api.clash_clan import *
 from clash_api.events import register_markup
 from config.prefs import CHAT_ID, CLAN_TAG, coc_client, dp, bot
-import services
-from db import DL
 
 
 @dp.message_handler(commands=['start'])
@@ -20,9 +20,6 @@ async def delete_user(message: types.Message):
 
 @dp.message_handler()
 async def answer_menu(message: types.Message):
-    if message.chat.id == -1001158139685:
-        await message.reply("Бот находиться на тестировании🛠. Просьба не беспокоить его лишний раз :3")
-        return -1
     if message.text == "📝":
         await message.reply("Кто ты в игре?", reply_markup=await register_markup())
     elif message.text == "👨‍💼":

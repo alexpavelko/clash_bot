@@ -1,3 +1,5 @@
+import asyncio
+
 import aiogram.types
 from aiogram import types
 from aiogram.types import ReplyKeyboardRemove
@@ -85,9 +87,8 @@ async def get_shields(message, is_registered):
 
 async def check_war_state(message):
     await bot.unpin_all_chat_messages(CHAT_ID)
-    message = await message.reply(text="Загрузка...")
-    await bot.pin_chat_message(CHAT_ID, message.message_id, True)
-    message_text = await clash_clan.check_war_state(message)
+    await asyncio.sleep(0.5)
+    message_text = await clash_clan.check_war_state()
     await bot.edit_message_text(message_text, CHAT_ID, message.message_id)
 
 

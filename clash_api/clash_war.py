@@ -1,31 +1,41 @@
-from config.prefs import coc_client, CLAN_TAG, telethon_client
+from config.prefs import coc_client, CLAN_TAG, telethon_client, bot, CHAT_ID
 from config.resources.constants import hello_message
 from db import DL
 
 
-async def send_message_to_users_without_attacks(text_message):  # send to telegram private message that player must do attacks
+async def create_war_state_message(war, hours):
+    result_msg = f"\nДо конца кв осталось {hours} часов\n"
+    if war.clan.tag == CLAN_TAG:
+        scores_string = f"Счет: {war.clan.name}:{war.clan.stars}⭐ ⚔ {war.opponent.stars}⭐ {war.opponent.name}"
+    else:
+        scores_string = f"Счет: {war.opponent.name}{war.opponent.stars}⭐ ⚔ {war.clan.stars}⭐ {war.clan.name}"
+    result_msg += scores_string + "\nПользователи уведомлены."
+    return result_msg
+
+
+async def send_message_to_users_without_attacks(text_message, war, hours):  # send to telegram private message that player must do attacks
     users_id_list = set(await get_telegram_users_id_list_without_attacks())
     for user_id in users_id_list:
         user = await telethon_client.get_entity(int(user_id))
         messages = await telethon_client.get_messages(user)
         if len(messages) == 0:
-        #     print(f"tg_user:{user.username if user.username is not None else user.first_name}: {hello_message}")
-        # print(f"tg_user:{user.username if user.username is not None else user.first_name}: {text_message}")
             await telethon_client.send_message(entity=user, message=hello_message)
         await telethon_client.send_message(entity=user, message=text_message)
+        if len(users_id_list) > 0:
+            result_msg = await create_war_state_message(war, hours)
+            try:
+                await bot.send_message(chat_id=CHAT_ID, text=result_msg)
+            except Exception:
+                pass
 
 
-async def get_tags_without_attacks():  # get player tags without attacks in war
+async def get_tags_without_attacks():
     tags_without_attacks = []
     war = await coc_client.get_current_war(CLAN_TAG)
     attacks_count = war.attacks_per_member
     for member in war.clan.members:
-        tags_without_attacks.append(member.tag)  # get all members list copy
-
-    for attack in war.clan.attacks:
-        member_attacks_count = len(attack.attacker.attacks)
-        if member_attacks_count < attacks_count:
-            tags_without_attacks.append(attack.attacker.tag)
+        if len(member.attacks) < attacks_count:
+            tags_without_attacks.append(member.tag)
     return tags_without_attacks
 
 
