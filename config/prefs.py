@@ -4,8 +4,8 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from telethon import TelegramClient
 
 # telegram chat
-# CHAT_ID = -1001158139685
-CHAT_ID = -1001830875232
+CHAT_ID = -1001158139685
+# CHAT_ID = -1001830875232 # FOR TEST CHAT
 
 # aiogram
 TOKEN = '1695339294:AAHGEZn-lFn5TiU3B8JRCjB909edF_vPHVI'

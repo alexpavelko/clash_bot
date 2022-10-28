@@ -3,7 +3,7 @@ import operator
 
 from clash_api import clash_war
 from clash_api.clash_player import mention_user
-from config.prefs import CLAN_TAG, coc_client, ACADEMY_CLAN_TAG
+from config.prefs import CLAN_TAG, coc_client, ACADEMY_CLAN_TAG, bot, CHAT_ID
 from config.resources.constants import roles, war_result, shield_colors
 
 
@@ -116,16 +116,16 @@ def get_progress_for_player(player, total=100):
 async def notify_attacks(total_sec, war):
     if total_sec == 3600:
         text_message = f"До конца войны остался 1 час! Проведи атаки!"
-        await clash_war.send_message_to_users_without_attacks(text_message, war, 3600)
+        await clash_war.send_message_to_users_without_attacks(text_message, war, 1)
     elif total_sec == 3600 * 6:
         text_message = f"До конца войны осталось 6 часов, проведи атаки!"
-        await clash_war.send_message_to_users_without_attacks(text_message, war, 3600 * 6)
+        await clash_war.send_message_to_users_without_attacks(text_message, war, 6)
     elif total_sec == 3600 * 12:
         text_message = f"Прошло 12 часов, проведи атаки в клешке!"
-        await clash_war.send_message_to_users_without_attacks(text_message, war, 3600 * 12)
+        await clash_war.send_message_to_users_without_attacks(text_message, war, 12)
     elif total_sec == 3600 * 23 + 3540:
         text_message = f"Кв началось, время провести первую атаку!"
-        await clash_war.send_message_to_users_without_attacks(text_message, war, 3600 * 23 + 59 * 60)
+        await clash_war.send_message_to_users_without_attacks(text_message, war, 24)
 
 
 async def check_war_state():
@@ -140,7 +140,6 @@ async def check_war_state():
         await notify_attacks(total_sec, war)
         await asyncio.sleep(1)
     shields = await get_shields()
-    return f"Война завершена. Результат: {war_result[war.status]}\n{shields}"
-
-
-
+    if war.status != '':
+        message_text = f"Война завершена. Результат: {war_result[war.status]}\n{shields}"
+        await bot.send_message(CHAT_ID, message_text)

@@ -4,12 +4,15 @@ from db import DL
 
 
 async def create_war_state_message(war, hours):
-    result_msg = f"\nДо конца кв осталось {hours} часов\n"
-    if war.clan.tag == CLAN_TAG:
-        scores_string = f"Счет: {war.clan.name}:{war.clan.stars}⭐ ⚔ {war.opponent.stars}⭐ {war.opponent.name}"
+    if hours == 24:
+        result_msg = "Кв началось, самое время провести первую атаку!"
     else:
-        scores_string = f"Счет: {war.opponent.name}{war.opponent.stars}⭐ ⚔ {war.clan.stars}⭐ {war.clan.name}"
-    result_msg += scores_string + "\nПользователи уведомлены."
+        result_msg = f"\nДо конца кв осталось {hours} часов\n"
+        if war.clan.tag == CLAN_TAG:
+            scores_string = f"Счет: {war.clan.name}:{war.clan.stars}⭐ ⚔ {war.opponent.stars}⭐ {war.opponent.name}"
+        else:
+            scores_string = f"Счет: {war.opponent.name}{war.opponent.stars}⭐ ⚔ {war.clan.stars}⭐ {war.clan.name}"
+        result_msg += scores_string + "\nПользователи уведомлены."
     return result_msg
 
 

@@ -1,9 +1,9 @@
-import asyncio
-
 import aiogram.types
 from aiogram import types
 from aiogram.types import ReplyKeyboardRemove
+
 from clash_api import clash_clan
+from clash_api.clash_clan import check_war_state
 from config.prefs import CHAT_ID, telethon_client, bot, coc_client
 from config.resources.constants import panic_message, kb_menu
 from db import DL
@@ -85,13 +85,6 @@ async def get_shields(message, is_registered):
         await message.reply(text=panic_message)
 
 
-async def check_war_state(message):
-    await bot.unpin_all_chat_messages(CHAT_ID)
-    await asyncio.sleep(0.5)
-    message_text = await clash_clan.check_war_state()
-    await bot.edit_message_text(message_text, CHAT_ID, message.message_id)
-
-
 async def start(message: aiogram.types.Message):
     if message.chat.id != CHAT_ID:
         await message.reply(text="Этот бот предназначен только одного чата. Вы не можете его использовать.",
@@ -99,6 +92,6 @@ async def start(message: aiogram.types.Message):
     else:
         if await has_permissions(message.from_user.id, "leader") or message.from_user.id == 485071499:
             await message.reply(text="Выбери действие", reply_markup=kb_menu)
-            await check_war_state(message)
+            await check_war_state()
         else:
             await message.reply("Недостаточно прав для выполнения команды")
