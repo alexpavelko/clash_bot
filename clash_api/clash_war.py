@@ -16,7 +16,7 @@ async def create_war_state_message(war, hours):
     return result_msg
 
 
-async def send_message_to_users_without_attacks(text_message, war, hours):  # send to telegram private message that player must do attacks
+async def send_message_to_users_without_attacks(text_message, war, hours):
     users_id_list = set(await get_telegram_users_id_list_without_attacks())
     for user_id in users_id_list:
         user = await telethon_client.get_entity(int(user_id))

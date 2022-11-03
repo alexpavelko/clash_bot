@@ -28,13 +28,12 @@ async def register_by_tag(callback_query: types.CallbackQuery):
     await bot.delete_message(CHAT_ID, message_to_remove_id)
     tag = callback_query.data[callback_query.data.find("user") + 4:]
     player = await coc_client.get_player(tag)
-    nickname = player.name
     tg_id = callback_query.from_user.id
     user_first_name = callback_query.from_user.first_name
     if DL.insert(tg_id, tag):
-        await bot.send_message(CHAT_ID, user_first_name + ' зарегистрировался как ' + nickname)
+        await bot.send_message(CHAT_ID, user_first_name + ' зарегистрировался как ' + player.name)
     else:
-        await bot.send_message(CHAT_ID, f"{nickname} уже зарегестрирован!")
+        await bot.send_message(CHAT_ID, f"{player.name} уже зарегестрирован!")
 
 
 @dp.callback_query_handler(text_contains="btn_del")

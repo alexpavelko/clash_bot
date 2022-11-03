@@ -14,8 +14,6 @@ async def mention_user(player_tag, player_name):
 
 def remove_symbols(str):
     for char in str:
-        if not char.isalnum():
+        if not char.isalnum() and char != ' ':
             str = str.replace(char, '')
     return str
-
-

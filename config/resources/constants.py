@@ -2,9 +2,16 @@ from aiogram.types import InlineKeyboardButton, ReplyKeyboardMarkup
 
 roles = {
     "leader": "глава",
-    "co-leader": "соруководитель",
+    "co_leader": "соруководитель",
     "elder": "старейшина",
     "member": "участник",
+}
+
+roles_priority = {
+    "leader": 1,
+    "co-leader": 2,
+    "elder": 3,
+    "member": 4
 }
 
 shield_colors = {

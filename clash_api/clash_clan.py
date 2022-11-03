@@ -34,15 +34,13 @@ async def get_shields():
 
 
 async def get_roles(clan):
-    players = []
-    result_string, current_role = "", "глава"
-    number = 1
+    players, result_string, current_role, number = [], "", "глава", 1
     for member in clan.members:
         player = await coc_client.get_player(member.tag)
         player_info = {
             "name": await mention_user(player.tag, player.name),
             "town_hall": player.town_hall,
-            "role": roles[str(member.role).lower()]
+            "role": roles[member.role.name.lower()]
         }
         players.append(player_info)
     players.sort(key=operator.itemgetter("town_hall"), reverse=True)
@@ -59,9 +57,9 @@ async def get_roles(clan):
 async def get_members():
     clan = await coc_client.get_clan(CLAN_TAG)
     academy_clan = await coc_client.get_clan(ACADEMY_CLAN_TAG)
-    result_message = "Игроки Dark Elite\n\n"
+    result_message = f"Игроки Dark Elite\n{clan.member_count}/50 игроков.\n\n"
     result_message += await get_roles(clan)
-    result_message += "\n\nИгроки академа(D.Elite Academy)\n\n"
+    result_message += f"\n\nИгроки академа(D.Elite Academy)\n{academy_clan.member_count}/50 игроков.\n\n"
     result_message += await get_roles(academy_clan)
     return result_message
 
@@ -81,14 +79,22 @@ def get_hero_percent(player, player_sum_level=0, player_max_sum_level=0, player_
     return percent
 
 
-async def get_rating_list():
-    clan = await coc_client.get_clan(CLAN_TAG)
+async def get_rating_for_clan(clan_tag):
+    clan = await coc_client.get_clan(clan_tag)
     players_to_draw = []
     for member in clan.members:
         player = await coc_client.get_player(member.tag)
         hero_percent = get_hero_percent(player)
         players_to_draw.append({'name': player.name, 'town_hall': player.town_hall, 'hero_percent': hero_percent})
-    return "Рейтинг игроков Dark Elite:\n\n" + get_progress_for_clan(players_to_draw)
+    return get_progress_for_clan(players_to_draw)
+
+
+async def get_rating_list():
+    result = "Рейтинг игроков Dark Elite:\n\n"
+    result += await get_rating_for_clan(CLAN_TAG)
+    result += "\n\nРейтинг игроков D.Elite Academy:\n\n"
+    result += await get_rating_for_clan(ACADEMY_CLAN_TAG)
+    return result
 
 
 def get_progress_for_clan(players):
@@ -123,7 +129,7 @@ async def notify_attacks(total_sec, war):
     elif total_sec == 3600 * 12:
         text_message = f"Прошло 12 часов, проведи атаки в клешке!"
         await clash_war.send_message_to_users_without_attacks(text_message, war, 12)
-    elif total_sec == 3600 * 23 + 3540:
+    elif total_sec == 3600 * 23 + 3539:
         text_message = f"Кв началось, время провести первую атаку!"
         await clash_war.send_message_to_users_without_attacks(text_message, war, 24)
 
@@ -132,14 +138,12 @@ async def check_war_state():
     war = await coc_client.get_current_war(CLAN_TAG)
     if war is None:
         return "Война не запущена."
-
     total_sec = war.end_time.seconds_until
-
     while 0 < total_sec < 24 * 3600:
         total_sec = war.end_time.seconds_until
         await notify_attacks(total_sec, war)
         await asyncio.sleep(1)
     shields = await get_shields()
     if war.status != '':
-        message_text = f"Война завершена. Результат: {war_result[war.status]}\n{shields}"
+        message_text = f"Война завершена. Результат: {war.clan.stars} ⚔ {war.opponent.stars}, {war_result[war.status]} \n{shields}"
         await bot.send_message(CHAT_ID, message_text)
