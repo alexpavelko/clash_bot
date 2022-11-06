@@ -3,7 +3,8 @@ from config.resources.constants import hello_message
 from db import DL
 
 
-async def create_war_state_message(war, hours):
+async def create_war_state_message(hours):
+    war = await coc_client.get_current_war(CLAN_TAG)
     if hours == 24:
         result_msg = "Кв началось, самое время провести первую атаку!"
     else:
@@ -16,7 +17,7 @@ async def create_war_state_message(war, hours):
     return result_msg
 
 
-async def send_message_to_users_without_attacks(text_message, war, hours):
+async def send_message_to_users_without_attacks(text_message, hours):
     users_id_list = set(await get_telegram_users_id_list_without_attacks())
     for user_id in users_id_list:
         user = await telethon_client.get_entity(int(user_id))
@@ -25,7 +26,7 @@ async def send_message_to_users_without_attacks(text_message, war, hours):
             await telethon_client.send_message(entity=user, message=hello_message)
         await telethon_client.send_message(entity=user, message=text_message)
         if len(users_id_list) > 0:
-            result_msg = await create_war_state_message(war, hours)
+            result_msg = await create_war_state_message(hours)
             try:
                 await bot.send_message(chat_id=CHAT_ID, text=result_msg)
             except Exception:

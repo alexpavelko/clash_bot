@@ -119,19 +119,19 @@ def get_progress_for_player(player, total=100):
     return result_msg
 
 
-async def notify_attacks(total_sec, war):
+async def notify_attacks(total_sec):
     if total_sec == 3600:
         text_message = f"До конца войны остался 1 час! Проведи атаки!"
-        await clash_war.send_message_to_users_without_attacks(text_message, war, 1)
+        await clash_war.send_message_to_users_without_attacks(text_message, 1)
     elif total_sec == 3600 * 6:
         text_message = f"До конца войны осталось 6 часов, проведи атаки!"
-        await clash_war.send_message_to_users_without_attacks(text_message, war, 6)
+        await clash_war.send_message_to_users_without_attacks(text_message, 6)
     elif total_sec == 3600 * 12:
         text_message = f"Прошло 12 часов, проведи атаки в клешке!"
-        await clash_war.send_message_to_users_without_attacks(text_message, war, 12)
-    elif total_sec == 3600 * 23 + 3539:
+        await clash_war.send_message_to_users_without_attacks(text_message, 12)
+    elif total_sec == 3600 * 23 + 1800:
         text_message = f"Кв началось, время провести первую атаку!"
-        await clash_war.send_message_to_users_without_attacks(text_message, war, 24)
+        await clash_war.send_message_to_users_without_attacks(text_message, 24)
 
 
 async def check_war_state():
@@ -141,7 +141,7 @@ async def check_war_state():
     total_sec = war.end_time.seconds_until
     while 0 < total_sec < 24 * 3600:
         total_sec = war.end_time.seconds_until
-        await notify_attacks(total_sec, war)
+        await notify_attacks(total_sec)
         await asyncio.sleep(1)
     shields = await get_shields()
     if war.status != '':
