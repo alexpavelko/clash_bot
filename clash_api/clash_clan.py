@@ -129,7 +129,7 @@ async def notify_attacks(total_sec):
     elif total_sec == 3600 * 12:
         text_message = f"Прошло 12 часов, проведи атаки в клешке!"
         await clash_war.send_message_to_users_without_attacks(text_message, 12)
-    elif total_sec == 3600 * 23 + 1800:
+    elif total_sec == (3600 * 24) - 180:
         text_message = f"Кв началось, время провести первую атаку!"
         await clash_war.send_message_to_users_without_attacks(text_message, 24)
 

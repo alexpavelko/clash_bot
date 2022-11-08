@@ -25,12 +25,8 @@ async def send_message_to_users_without_attacks(text_message, hours):
         if len(messages) == 0:
             await telethon_client.send_message(entity=user, message=hello_message)
         await telethon_client.send_message(entity=user, message=text_message)
-        if len(users_id_list) > 0:
-            result_msg = await create_war_state_message(hours)
-            try:
-                await bot.send_message(chat_id=CHAT_ID, text=result_msg)
-            except Exception:
-                pass
+    result_msg = await create_war_state_message(hours)
+    await bot.send_message(chat_id=CHAT_ID, text=result_msg)
 
 
 async def get_tags_without_attacks():
