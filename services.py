@@ -35,7 +35,7 @@ async def delete_user(message: aiogram.types.Message):
             else:
                 DL.delete(tg_id).fetchall()
                 user = await telethon_client.get_entity(int(tg_id))
-                mention = f"[@{user.first_name if user.first_name is not None else user.username}](tg://user?id={tg_id})"
+                mention = f"[@{user.first_name if user.first_name is not '' else user.username}](tg://user?id={tg_id})"
                 message_text = f"Все данные пользователя были удалены. {mention}, пройдите регистрацию заново."
                 await message.reply(text=message_text, parse_mode="Markdown")
         else:
@@ -44,6 +44,8 @@ async def delete_user(message: aiogram.types.Message):
 
 async def parse_tg_id(message: aiogram.types.Message):
     text = message.md_text.replace('/delete ', '')
+    while '\\' in text:
+        text = text.replace('\\', '')
     if text.startswith('@'):
         try:
             user = await telethon_client.get_entity(text)
