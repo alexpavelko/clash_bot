@@ -35,7 +35,7 @@ async def delete_user(message: aiogram.types.Message):
             else:
                 DL.delete(tg_id).fetchall()
                 user = await telethon_client.get_entity(int(tg_id))
-                mention = f"[@{user.first_name if user.first_name is not '' else user.username}](tg://user?id={tg_id})"
+                mention = f"[@{user.first_name if user.first_name != '' else user.username}](tg://user?id={tg_id})"
                 message_text = f"Все данные пользователя были удалены. {mention}, пройдите регистрацию заново."
                 await message.reply(text=message_text, parse_mode="Markdown")
         else:
@@ -97,3 +97,16 @@ async def start(message: aiogram.types.Message):
             await check_war_state()
         else:
             await message.reply("Недостаточно прав для выполнения команды")
+
+
+async def user_join(event):
+    user = await telethon_client.get_entity(event.user_id)
+    mentioned_user = f"[{user.first_name if user.first_name != '' else user.username}](tg://user?id={event.user_id})"
+    reply_message = f"Приветсвуем в нашей пати🎉, {mentioned_user}! Нажми на 📝 внизу чтобы зарегистрироваться" \
+                    f" в нашем боте, чтобы мы знали кто ты и могли вовремя напомнить тебе про атаки⚔. Приятного общения!"
+    await bot.send_message(CHAT_ID, reply_message, parse_mode="Markdown")
+
+
+async def user_left(event):
+    if DL.exists_by_tg_id(event.user_id):
+        DL.delete(event.user_id)

@@ -1,11 +1,22 @@
 import coc
+import telethon.events.common
 from aiogram import types
 from aiogram.utils import executor
+from telethon import events
 
 import services
 from clash_api.clash_clan import *
 from clash_api.events import register_markup
-from config.prefs import CHAT_ID, CLAN_TAG, coc_client, dp, bot
+from config.prefs import CHAT_ID, CLAN_TAG, coc_client, dp, bot, telethon_client
+from db import DL
+
+
+@telethon_client.on(events.ChatAction)
+async def handler(event: telethon.events.ChatAction.Event):
+    if event.user_joined or event.user_added:
+        await services.user_join(event)
+    elif event.user_left or event.user_kicked:
+        await services.user_left(event)
 
 
 @dp.message_handler(commands=['start'])
@@ -45,6 +56,3 @@ async def on_clan_member_leave(member, clan):
 
 if __name__ == '__main__':
     executor.start_polling(dp)
-
-
-
