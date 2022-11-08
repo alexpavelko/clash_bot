@@ -144,6 +144,7 @@ async def check_war_state():
         await notify_attacks(total_sec)
         await asyncio.sleep(1)
     shields = await get_shields()
+    war = await coc_client.get_current_war(CLAN_TAG)  # refresh war data
     if war.status != '':
         message_text = f"Война завершена. Результат: {war.clan.stars} ⚔ {war.opponent.stars}, {war_result[war.status]} \n{shields}"
         await bot.send_message(CHAT_ID, message_text)
